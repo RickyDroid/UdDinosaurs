@@ -73,31 +73,35 @@
         "fact": "All birds are living dinosaurs."
     }
 ]
-    const dinoArray = [];
+    //Array of dinasaur objects plus one human object appended to the end
+    const dataObjs = [];
 
     //References to HTML elements
     const form = document.getElementById('dino-compare');
     const button = document.getElementById("btn");
 
-
     //Dino factory function with functional mixins
     //All objects created close over the facts array and name
     function DinoMaker(dinoPropObj){ 
        const facts = [];
+       const dinoHumanFacts = [];
        let species = dinoPropObj.species;
-       facts.push(dinoPropObj.weight);
-       facts.push(dinoPropObj.height);
-       facts.push(dinoPropObj.diet);
-       facts.push(dinoPropObj.where);
-       facts.push(dinoPropObj.when);
-       facts.push(dinoPropObj.fact); 
+       facts.push(dinoPropObj.weight); //index 0
+       facts.push(dinoPropObj.height); //index 1
+       facts.push(dinoPropObj.diet);   //index 2 
+       facts.push(dinoPropObj.where);  //index 3
+       facts.push(dinoPropObj.when);   //index 4
+       facts.push(dinoPropObj.fact);   //index 5
 
        return Object.assign({},{
-            addFact : function(){
-
-            },
-            showName : function(){
+            species : function(){
                 return species;
+            },
+            addFact : function(data){
+                dinoHumanFacts.push(data);
+            },
+            selectFactComp : function(indexNum){
+                return dinoHumanFacts[indexNum];
             },
             randomFact : function(){
                 if (facts.length > 0) {
@@ -118,36 +122,64 @@
        });
     }
 
-    // Create Dino Objects
-    for(i = 0; i < dinos.length; i++){
-       dinoArray[i] = DinoMaker(dinos[i]);
+    // Create dino data objects and add to dataObjs array
+    function createDinos(){
+        for(i = 0; i < dinos.length; i++){
+            dataObjs[i] = DinoMaker(dinos[i]);
+        }
     }
-     console.log(dinoArray[0].showName());
+    createDinos();
+    
+    //Constructor using the revealing module pattern to create
+    //one human object and append to dataObjs array
+    function CreateHuman(){
+       let human = (function(){
+            const name = form.name.value;
+            const feet = form.feet.value;
+            const inches = form.inches.value;
+            const weight = form.weight.value; //lbs
+            const diet = form.diet.value; 
+            function heightInInches(){
+                return (parseInt(feet) * 12) + parseInt(inches);
+            } 
+           return {
+              name : name,
+              feet : feet,
+              inches : inches,
+              weight : weight,
+              diet : diet,
+              heightInInches : heightInInches
+           }
+       })() 
+       //Append human object to dataObjs array at index 8
+       dataObjs.push(human);
+    }
     
     //Create the human object
-     button.addEventListener("click", function(){
-       let name = form.name.value;
-       let feet = form.feet.value;
-       let inches = form.inches.value;
-       let weight = form.weight.value;
-       let diet = form.diet.value; 
-      
-       console.log(`${name} ${feet} ${inches} ${weight} ${diet}`)
+    button.addEventListener("click", function(){
+        // createDinos();
+        CreateHuman();
+        compareHeight();
     })
    
-
     
+    function compareHeight(){
+        //TODO --loop though dataObjs array and compare all their heights
+         
+        let dHeight = dataObjs[0].selectFact(1); //height of dino
+        let hHeight = dataObjs[8].heightInInches(); //height of human
+        let hDif = dHeight - hHeight;
+        dataObjs[0].addFact(hDif); //add new fact to dino
+        console.log(dataObjs[0].selectFactComp(0));
+    }
     
+    function compareWeight(){
 
-    // Create Dino Compare Method 1
-    // NOTE: Weight in JSON file is in lbs, height in inches. 
-
-    // Create Dino Compare Method 2
-    // NOTE: Weight in JSON file is in lbs, height in inches.
-
-    // Create Dino Compare Method 3
-    // NOTE: Weight in JSON file is in lbs, height in inches.
-
+    }
+   
+    function compareWhenBorn(){
+       //TODO - Add another DOB field to form
+    }
 
     // Generate Tiles for each Dino in Array
   
