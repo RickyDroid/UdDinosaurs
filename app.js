@@ -131,16 +131,14 @@
             }
        });
     }
-    //IIFE Create dino data objects and add to dataObjs array then initialise 
-    (function createDinos(){
+    //Create dino data objects and add to dataObjs array then initialise 
+    function createDinos(){
+        //TODO - clear dataObjs array -- IMPORTANT 
         for(i = 0; i < dinos.length; i++){
             dataObjs[i] = DinoMaker(dinos[i]);  
         }
-    })()
-
-   
-    // console.log(dataObjs[6].randomFact());
-    
+    }
+  
     //Constructor using the revealing module pattern to create
     //one human object and append to dataObjs array
     function CreateHuman(){
@@ -168,28 +166,39 @@
     
     //Create the human object
     button.addEventListener("click", function(){
+        createDinos();
         CreateHuman();
         compareHeight();
-        console.log(dataObjs[0].getFact(6));
     })
    
     function compareHeight(){
-        //TODO --loop though dataObjs array and compare all their heights  
-        let dinoHeight = dataObjs[0].getData('height'); //height of dino
-        let humanHeight = dataObjs[8].heightInInches(); //height of human
-        let dif = Math.abs(dinoHeight - humanHeight);
-        let feet = Math.round(dif / 12);
-        let inches = (dif - feet);
-        let newFact = '';
-        if (dinoHeight === humanHeight){
-            newFact = `Amazing!, we are the same height`;
-        }
-        else if (dinoHeight > humanHeight) {
-            newFact = `I am ${feet} feet and ${inches} inches shorter than you`;
-        }else{
-            newFact = `I am ${feet} feet and ${inches} inches taller than you`;
-        } 
-        dataObjs[0].addFact(newFact);  
+        //loop though dataObjs array upto the penultimate index position 
+        let lastIdxPos = dataObjs.length - 1;
+       for (let i = 0; i < dataObjs.length; i++) {
+           //no new facts for the pigeon or human
+           if ((dataObjs[i].getData('species') === 'pigeon') || 
+              (dataObjs[i].getData('species') === 'human')){
+              continue;
+           }
+           //Height difference data
+           let dinoHeight = dataObjs[i].getData('height'); 
+           let humanHeight = dataObjs[lastIdxPos].heightInInches(); 
+           let dif = Math.abs(dinoHeight - humanHeight);
+           let feet = Math.round(dif / 12);
+           let inches = (dif % 12);
+           //Compare heights 
+           let newFact = '';
+           if (dinoHeight === humanHeight){
+               newFact = `Amazing!, we are the same height`;
+           }
+           else if (dinoHeight > humanHeight) {
+               newFact = `I am ${feet} feet and ${inches} inches taller than you`;
+           }else{
+               newFact = `I am ${feet} feet and ${inches} inches shorter than you`;
+           } 
+           //Add the new fact to the current dino object
+           dataObjs[i].addFact(newFact); 
+       }   
     }
     
     function compareWeight(){
