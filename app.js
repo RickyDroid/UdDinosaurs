@@ -75,7 +75,6 @@
 ]
     //Array of dinasaur objects plus one human object appended to the end
     const dataObjs = [];
-
     //References to HTML elements
     const form = document.getElementById('dino-compare');
     const button = document.getElementById("btn");
@@ -83,25 +82,40 @@
     //Dino factory function with functional mixins
     //All objects created close over the facts array and name
     function DinoMaker(dinoPropObj){ 
+       const data = [];
        const facts = [];
-       const dinoHumanFacts = [];
-       let species = dinoPropObj.species;
-       facts.push(dinoPropObj.weight); //index 0
-       facts.push(dinoPropObj.height); //index 1
-       facts.push(dinoPropObj.diet);   //index 2 
-       facts.push(dinoPropObj.where);  //index 3
-       facts.push(dinoPropObj.when);   //index 4
-       facts.push(dinoPropObj.fact);   //index 5
-
-       return Object.assign({},{
-            species : function(){
-                return species;
+       //Add data to data array
+       data.push(dinoPropObj.species); //index 0
+       data.push(parseInt(dinoPropObj.weight)); //index 1
+       data.push(parseInt(dinoPropObj.height)); //index 2
+       data.push(dinoPropObj.diet);   //index 3 
+       data.push(dinoPropObj.where);  //index 4
+       data.push(dinoPropObj.when);   //index 5
+       //Add fact to facts array
+       facts.push(dinoPropObj.fact);   //index 0
+       if (dinoPropObj.species !== 'Pigeon'){
+           facts.push(`I weight ${data[1]} lbs`);
+           facts.push(`My height is ${data[2]} inches`);
+           facts.push(`My diet is ${data[3]}`);
+           facts.push(`My location is ${data[4]}`);
+           facts.push(`I am here in the ${data[5]} period`);
+       }
+       
+        return Object.assign({},{
+            getData : function(d){
+                let retData;
+                switch (d.toLowerCase()) {
+                    case 'species': retData = data[0]; break; 
+                    case 'weight': retData = data[1]; break;
+                    case 'height': retData = data[2]; break;
+                    case 'diet': retData = data[3]; break;
+                    case 'where': retData = data[4]; break; 
+                    case 'when': retData = data[5]; break;     
+                }
+                return retData;
             },
-            addFact : function(data){
-                dinoHumanFacts.push(data);
-            },
-            selectFactComp : function(indexNum){
-                return dinoHumanFacts[indexNum];
+            addFact : function(fact){
+                facts.push(fact);
             },
             randomFact : function(){
                 if (facts.length > 0) {
@@ -112,35 +126,32 @@
                     return('Sorry - No more facts available!');
                 }
             },
-            selectFact : function(indexNum){
-                if (indexNum >= 0 && indexNum < facts.length){
-                    return facts[indexNum];
-                }else{
-                    return('Sorry - Incorrect fact number!'); 
-                }
-           }
+            getFact : function(n){ //temo for testing
+                return(facts[n])
+            }
        });
     }
-
-    // Create dino data objects and add to dataObjs array
-    function createDinos(){
+    //IIFE Create dino data objects and add to dataObjs array then initialise 
+    (function createDinos(){
         for(i = 0; i < dinos.length; i++){
-            dataObjs[i] = DinoMaker(dinos[i]);
+            dataObjs[i] = DinoMaker(dinos[i]);  
         }
-    }
-    createDinos();
+    })()
+
+   
+    // console.log(dataObjs[6].randomFact());
     
     //Constructor using the revealing module pattern to create
     //one human object and append to dataObjs array
     function CreateHuman(){
        let human = (function(){
             const name = form.name.value;
-            const feet = form.feet.value;
-            const inches = form.inches.value;
-            const weight = form.weight.value; //lbs
+            const feet = parseInt(form.feet.value);
+            const inches = parseInt(form.inches.value);
+            const weight = parseInt(form.weight.value); //lbs
             const diet = form.diet.value; 
             function heightInInches(){
-                return (parseInt(feet) * 12) + parseInt(inches);
+                return (feet * 12) + inches;
             } 
            return {
               name : name,
@@ -157,20 +168,28 @@
     
     //Create the human object
     button.addEventListener("click", function(){
-        // createDinos();
         CreateHuman();
         compareHeight();
+        console.log(dataObjs[0].getFact(6));
     })
    
-    
     function compareHeight(){
-        //TODO --loop though dataObjs array and compare all their heights
-         
-        let dHeight = dataObjs[0].selectFact(1); //height of dino
-        let hHeight = dataObjs[8].heightInInches(); //height of human
-        let hDif = dHeight - hHeight;
-        dataObjs[0].addFact(hDif); //add new fact to dino
-        console.log(dataObjs[0].selectFactComp(0));
+        //TODO --loop though dataObjs array and compare all their heights  
+        let dinoHeight = dataObjs[0].getData('height'); //height of dino
+        let humanHeight = dataObjs[8].heightInInches(); //height of human
+        let dif = Math.abs(dinoHeight - humanHeight);
+        let feet = Math.round(dif / 12);
+        let inches = (dif - feet);
+        let newFact = '';
+        if (dinoHeight === humanHeight){
+            newFact = `Amazing!, we are the same height`;
+        }
+        else if (dinoHeight > humanHeight) {
+            newFact = `I am ${feet} feet and ${inches} inches shorter than you`;
+        }else{
+            newFact = `I am ${feet} feet and ${inches} inches taller than you`;
+        } 
+        dataObjs[0].addFact(newFact);  
     }
     
     function compareWeight(){
