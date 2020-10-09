@@ -142,6 +142,7 @@
             dataObjs[i] = DinoMaker(dinos[i]);  
         }
     }
+    createDinos();
     //Constructor using the revealing module pattern to create
     //one human object and append to dataObjs array
     function CreateHuman(){
@@ -238,7 +239,22 @@
 
      
     // Generate Tiles for each Dino in Array
-  
+    function generateTiles(){
+        for(let i = 0; i < dataObjs.length; i++){
+            let species = dataObjs[i].getData('species'); 
+            let picURL = 'images/' + species.toLowerCase() + '.png';
+            let fact = dataObjs[i].randomFact();
+            let tile = 'tile' + i;
+            let currentTile = document.getElementById(`${tile}`);
+            let html = '';
+            html += `<h3>${species}</h3>`;
+            html += `<img src = "${picURL}">`
+            html += `<p>${fact}</p>`;
+            currentTile.innerHTML = html;
+        } 
+    }
+
+    generateTiles();
         // Add tiles to DOM
 
     // Remove form from screen
