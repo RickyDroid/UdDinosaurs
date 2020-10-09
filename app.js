@@ -78,6 +78,7 @@
     let humanObj = {};
     //References to HTML elements
     const form = document.getElementById('dino-compare');
+    const table = document.getElementById('table-compare');
     const button = document.getElementById("btn");
 
     //Dino factory function with functional mixins
@@ -142,7 +143,6 @@
             dataObjs[i] = DinoMaker(dinos[i]);  
         }
     }
-    createDinos();
     //Constructor using the revealing module pattern to create
     //one human object and append to dataObjs array
     function CreateHuman(){
@@ -250,19 +250,19 @@
             html += `<h3>${species}</h3>`;
             html += `<img src = "${picURL}">`
             html += `<p>${fact}</p>`;
+            //Add tiles to the DOM
             currentTile.innerHTML = html;
         } 
     }
 
-    generateTiles();
-        // Add tiles to DOM
-
-    // Remove form from screen
-
-
+    
 // On button click, prepare and display infographic
 button.addEventListener("click", function(){
     createDinos();
     CreateHuman();
     generateFacts();
+    generateTiles();
+    //Remove form and display table 
+    form.hidden = true;
+    table.hidden = false;
 })
