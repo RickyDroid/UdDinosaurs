@@ -48,7 +48,7 @@ p {
 .grid-item {
     position: relative;
     box-sizing: border-box;
-    width: 100%;
+    width: 33%;
 }
 
 .grid-item:nth-child(1){
