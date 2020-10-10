@@ -73,7 +73,9 @@
         "fact": "All birds are living dinosaurs."
     }
 ]
+    //Main array to hold all objects  
     const dataObjs = [];
+    //Human object
     let humanObj = {};
     //References to HTML elements
     const form = document.getElementById('dino-compare');
@@ -81,7 +83,30 @@
     const button = document.getElementById("btn");
     const buttonFacts = document.getElementById("btnFacts");
 
-    //Dino factory function 
+    //Validate form input 
+    function validateInput(){
+        if (form.name.value == "" ) {
+            alert("Please provide your name!");
+            form.name.focus() ;
+            return false;
+         }else if (form.feet.value === ''){
+            alert("Please privide your height in feet!");
+            form.feet.focus();
+            return false; 
+         }else if (form.inches.value === ''){
+             alert("Please privide your height in inches!");
+             form.inches.focus();
+             return false;
+         }else if (form.weight.value === ''){
+             alert("Please provide your weight in lbs!");
+             form.weight.focus();
+             return false;
+         }else{
+             return true;
+         }
+    }
+
+    //CONSTRUCTOR for dino objects - factory function 
     //All objects created close over the facts array and dino data
     function DinoMaker(dinoPropObj){ 
        const facts = [];
@@ -93,8 +118,9 @@
        let where = dinoPropObj.where;  
        let when = dinoPropObj.when;   
        //Add fact to facts array 
-       facts.push(dinoPropObj.fact);   
-       if (dinoPropObj.species !== 'Pigeon'){ //don't add more facts to pigean
+       facts.push(dinoPropObj.fact);  
+       //Don't add more facts to pigean 
+       if (dinoPropObj.species !== 'Pigeon'){ 
            facts.push(`I weight ${weight} lbs`);
            facts.push(`My height is ${height} inches`);
            facts.push(`My diet is ${diet}`);
@@ -129,21 +155,21 @@
         return {
             //Method to return all dino data
             getData : getData, 
-            //Method to add the human / dino comparison facts
+            //Method to add the human/dino comparison facts
             addFact : addFact,
             //Method to return random facts
             randomFact : randomFact
        };
     }
+
     //Create dino data objects and add to dataObjs array 
     function createDinos(){
-        //TODO - clear dataObjs array -- IMPORTANT 
         for(i = 0; i < dinos.length; i++){
             dataObjs[i] = DinoMaker(dinos[i]);  
         }
     }
-    //Constructor using the revealing module pattern to create
-    //one human object and append to dataObjs array
+
+    //CONSTRUCTOR for human object - revealing module pattern 
     function CreateHuman(){
        let human = (function(){
             let name = form.name.value;
@@ -151,7 +177,6 @@
             let inches = parseInt(form.inches.value);
             let weight = parseInt(form.weight.value); //lbs
             let diet = form.diet.value;
-            //Method to return all person data 
             function getData(d){
                 let retData;
                 switch (d.toLowerCase()) {
@@ -176,9 +201,11 @@
        })() 
        humanObj = human;
     }
-     
+    
+    //Compare dino/human data to create new facts
     function generateFacts(){
         for (const dino of dataObjs) {
+            //Don't add more facts to pigean 
             if (dino.getData('species').toLowerCase() !== 'pigeon'){
                 compareHeight(dino);
                 compareWeight(dino);  
@@ -218,7 +245,7 @@
         }else if (dinoWeight > humanWeight){
             newFact = `I am ${lbs} lbs heavier then you`;
         }else{
-            newFact = `I am ${lbs} lbs lighter than you}`
+            newFact = `I am ${lbs} lbs lighter than you`;
         }
         //Add the new fact to the current dino object
         dinoObj.addFact(newFact);
@@ -238,18 +265,23 @@
         dinoObj.addFact(newFact);
     }
 
-    //TODO - make dataObjs random order plus add human to center
+    //Randomize dataObjs array then add human to center 
     function addHuman(){
-        //ramdomize the array 
-        //add the human to the center element
-        dataObjs.push(humanObj);
+        //Using the Fisher-Yates Algorithm to randomize the array
+        for(let i = dataObjs.length - 1; i > 0; i--){
+            const j = Math.floor(Math.random() * i);
+            const temp = dataObjs[i];
+            dataObjs[i] = dataObjs[j];
+            dataObjs[j] = temp;
+        }
+        //Add the human to the center element
+        dataObjs.splice(4,0,humanObj);
     }
 
-     
     // Generate Tiles for each Dino in Array
     function generateTiles(){
         for(let i = 0; i < dataObjs.length; i++){
-            //identify the human object
+            //Identify the human object
            if (dataObjs[i].hasOwnProperty('heightInInches')){
                makeHumanTile(i);
            }else{
@@ -283,18 +315,22 @@
         currentTile.innerHTML = html;
     }     
     
+    function setDisplay(){
+        form.hidden = true; //hide form
+        table.hidden = false; //show table 
+        buttonFacts.hidden = false; //show facts button
+    }
 
 // On button click, prepare and display infographic
 button.addEventListener("click", function(){
-    createDinos();
-    CreateHuman();
-    generateFacts();
-    addHuman();
-    generateTiles();
-    //Remove form and display table and button
-    form.hidden = true;
-    table.hidden = false; 
-    buttonFacts.hidden = false; 
+   if (validateInput()){
+        createDinos();
+        CreateHuman();
+        generateFacts();
+        addHuman();
+        generateTiles();
+        setDisplay();
+   } 
 })
 
 buttonFacts.addEventListener("click", function(){
