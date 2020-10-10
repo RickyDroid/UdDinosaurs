@@ -79,63 +79,63 @@
     const form = document.getElementById('dino-compare');
     const table = document.getElementById('table-compare');
     const button = document.getElementById("btn");
+    const buttonFacts = document.getElementById("btnFacts");
 
-    //Dino factory function with functional mixins
-    //All objects created close over the facts array and name
+    //Dino factory function 
+    //All objects created close over the facts array and dino data
     function DinoMaker(dinoPropObj){ 
-       const data = [];
        const facts = [];
-       //Add data to data array
-       data.push(dinoPropObj.species); //index 0
-       data.push(parseInt(dinoPropObj.weight)); //index 1
-       data.push(parseInt(dinoPropObj.height)); //index 2
-       data.push(dinoPropObj.diet);   //index 3 
-       data.push(dinoPropObj.where);  //index 4
-       data.push(dinoPropObj.when);   //index 5
+       //Dino data
+       let species = dinoPropObj.species; 
+       let weight = parseInt(dinoPropObj.weight);
+       let height = parseInt(dinoPropObj.height); 
+       let diet = dinoPropObj.diet;   
+       let where = dinoPropObj.where;  
+       let when = dinoPropObj.when;   
        //Add fact to facts array 
-       facts.push(dinoPropObj.fact);   //index 0
+       facts.push(dinoPropObj.fact);   
        if (dinoPropObj.species !== 'Pigeon'){ //don't add more facts to pigean
-           facts.push(`I weight ${data[1]} lbs`);
-           facts.push(`My height is ${data[2]} inches`);
-           facts.push(`My diet is ${data[3]}`);
-           facts.push(`My location is ${data[4]}`);
-           facts.push(`I am here in the ${data[5]} period`);
-       }
-       
-        return Object.assign({},{
-            //Method to return all dino data
-            getData : function(d){
-                let retData;
-                switch (d.toLowerCase()) {
-                    case 'species': retData = data[0]; break; 
-                    case 'weight': retData = data[1]; break;
-                    case 'height': retData = data[2]; break;
-                    case 'diet': retData = data[3]; break;
-                    case 'where': retData = data[4]; break; 
-                    case 'when': retData = data[5]; break;     
-                }
-                return retData;
-            },
-            //Method to add the human / dino comparison facts
-            addFact : function(fact){
-                facts.push(fact);
-            },
-            //Method to return random facts
-            randomFact : function(){
-                if (facts.length > 0) {
-                    let i = Math.floor(Math.random() * facts.length);
-                    let fact = facts.splice(i,1); //get and delete from array
-                    return(fact[0]);
-                }else{
-                    return('Sorry - No more facts available!');
-                }
-            },
-            getFact : function(n){ //temo for testing
-                return(facts[n])
+           facts.push(`I weight ${weight} lbs`);
+           facts.push(`My height is ${height} inches`);
+           facts.push(`My diet is ${diet}`);
+           facts.push(`My location is ${where}`);
+           facts.push(`I am here in the ${when} period`);
+       }  
+        function getData(d){
+            let retData;
+            switch (d.toLowerCase()) {
+                case 'species': retData = species; break; 
+                case 'weight': retData = weight; break;
+                case 'height': retData = height; break;
+                case 'diet': retData = diet; break;
+                case 'where': retData = where; break; 
+                case 'when': retData = when; break;     
             }
-       });
+            return retData;
+        };
+        function addFact(fact){
+            facts.push(fact);
+        };
+        function randomFact(){
+            if (facts.length > 0) {
+                let i = Math.floor(Math.random() * facts.length);
+                let fact = facts.splice(i,1); //get and delete from array
+                return(fact[0]);
+            }else{
+                return('Sorry - No more facts available!');
+            }
+        };
+        //RETURN OBJECT
+        return {
+            //Method to return all dino data
+            getData : getData, 
+            //Method to add the human / dino comparison facts
+            addFact : addFact,
+            //Method to return random facts
+            randomFact : randomFact
+       };
     }
-    //Create dino data objects and add to dataObjs array then initialise 
+    //Create dino data objects and add to dataObjs array 
     function createDinos(){
         //TODO - clear dataObjs array -- IMPORTANT 
         for(i = 0; i < dinos.length; i++){
@@ -163,21 +163,23 @@
                 }
                 return retData;
             }
-            //Method to convert feet and inches to inches
             function heightInInches(){
                 return (feet * 12) + inches;
             } 
-           return {
-              getData : getData,
-              heightInInches : heightInInches
-           }
+            //RETURN OBJECT
+            return {
+                //Method to return all human data 
+                getData : getData,
+                //Method to convert feet and inches to inches
+                heightInInches : heightInInches
+            }
        })() 
        humanObj = human;
     }
      
     function generateFacts(){
         for (const dino of dataObjs) {
-            if (dino.getData('species') !== 'Pigeon'){
+            if (dino.getData('species').toLowerCase() !== 'pigeon'){
                 compareHeight(dino);
                 compareWeight(dino);  
                 compareDiet(dino);            
@@ -238,6 +240,8 @@
 
     //TODO - make dataObjs random order plus add human to center
     function addHuman(){
+        //ramdomize the array 
+        //add the human to the center element
         dataObjs.push(humanObj);
     }
 
@@ -280,7 +284,6 @@
     }     
     
 
-    
 // On button click, prepare and display infographic
 button.addEventListener("click", function(){
     createDinos();
@@ -288,7 +291,12 @@ button.addEventListener("click", function(){
     generateFacts();
     addHuman();
     generateTiles();
-    //Remove form and display table 
+    //Remove form and display table and button
     form.hidden = true;
-    table.hidden = false;
+    table.hidden = false; 
+    buttonFacts.hidden = false; 
+})
+
+buttonFacts.addEventListener("click", function(){
+    generateTiles();
 })
