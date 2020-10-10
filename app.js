@@ -73,7 +73,6 @@
         "fact": "All birds are living dinosaurs."
     }
 ]
-    //Array of dinasaur objects plus one human object appended to the end
     const dataObjs = [];
     let humanObj = {};
     //References to HTML elements
@@ -237,23 +236,49 @@
         dinoObj.addFact(newFact);
     }
 
+    //TODO - make dataObjs random order plus add human to center
+    function addHuman(){
+        dataObjs.push(humanObj);
+    }
+
      
     // Generate Tiles for each Dino in Array
     function generateTiles(){
         for(let i = 0; i < dataObjs.length; i++){
-            let species = dataObjs[i].getData('species'); 
-            let picURL = 'images/' + species.toLowerCase() + '.png';
-            let fact = dataObjs[i].randomFact();
-            let tile = 'tile' + i;
-            let currentTile = document.getElementById(`${tile}`);
-            let html = '';
-            html += `<h3>${species}</h3>`;
-            html += `<img src = "${picURL}">`
-            html += `<p>${fact}</p>`;
-            //Add tiles to the DOM
-            currentTile.innerHTML = html;
-        } 
-    }
+            //identify the human object
+           if (dataObjs[i].hasOwnProperty('heightInInches')){
+               makeHumanTile(i);
+           }else{
+               makeDinoTile(i);
+           }
+        }
+    }    
+        
+    function makeDinoTile(i){
+        let species = dataObjs[i].getData('species'); 
+        let picURL = 'images/' + species.toLowerCase() + '.png';
+        let fact = dataObjs[i].randomFact();
+        let tile = 'tile' + i;
+        let currentTile = document.getElementById(`${tile}`);
+        let html = '';
+        html += `<h3>${species}</h3>`;
+        html += `<img src = "${picURL}">`
+        html += `<p>${fact}</p>`;
+        //Add tiles to the DOM
+        currentTile.innerHTML = html;
+    }    
+            
+    function makeHumanTile(i){
+        let name = dataObjs[i].getData('name');
+        let tile = 'tile' + i;
+        let currentTile = document.getElementById(`${tile}`);
+        let html = '';
+        html += `<h3>${name}</h3>`;
+        html += `<img src = "images/human.png">`
+        //Add tiles to the DOM
+        currentTile.innerHTML = html;
+    }     
+    
 
     
 // On button click, prepare and display infographic
@@ -261,6 +286,7 @@ button.addEventListener("click", function(){
     createDinos();
     CreateHuman();
     generateFacts();
+    addHuman();
     generateTiles();
     //Remove form and display table 
     form.hidden = true;
